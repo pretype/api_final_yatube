@@ -56,7 +56,7 @@ class FollowSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault()
     )
     following = serializers.SlugRelatedField(
-        slug_field='username', queryset=User.objects.all())
+        queryset=User.objects.all(), slug_field='username', )
 
     class Meta:
         """Класс с метаданными модели подписок."""
@@ -67,14 +67,15 @@ class FollowSerializer(serializers.ModelSerializer):
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
                 fields=('user', 'following'),
-                message=('Ошибка.')
-            ),
+                message=('Ошибка. Подписка уже оформлена.'),
+
+            )
         ]
 
     def validate(self, data):
         """Валидация несовпадения пользователя и его подписки."""
         if self.context['request'].user == data['following']:
             raise serializers.ValidationError(
-                'Ошибка.'
+                'Ошибка. Нельзя оформить подписку на самого себя.'
             )
         return data

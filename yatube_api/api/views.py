@@ -3,12 +3,12 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, viewsets
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import (IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from .permissions import IsAuthorOnly, IsAuthorOrReadOnly
+from .permissions import IsAuthorOrReadOnly, IsFollowerOnly
 from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
                           PostSerializer)
-from posts.models import Group, Post
+from posts.models import Follow, Group, Post
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -54,13 +54,13 @@ class FollowViewSet(viewsets.ModelViewSet):
     """Класс с определением представления подписок."""
 
     serializer_class = FollowSerializer
-    permission_classes = (IsAuthorOnly,)
+    permission_classes = (IsFollowerOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('following__username',)
 
     def get_queryset(self):
-        """Отдаёт список пользователей."""
-        return self.request.user.user.all()
+        """Отдаёт список подписок."""
+        return Follow.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         """Сохраняет подписку."""
