@@ -13,11 +13,3 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         ) or (
             user_content_obj.author == request.user
         )
-
-
-class IsFollowerOnly(permissions.IsAuthenticated):
-    """Класс, определяющий права подписчика."""
-
-    def has_object_permission(self, request, view, user_content_obj):
-        """Проверяет доступ текущего пользователя к функциям приложения."""
-        return user_content_obj.user == request.user
